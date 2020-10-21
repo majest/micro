@@ -169,7 +169,7 @@ func (r *Runtime) Create(ctx context.Context, req *pb.CreateRequest, rsp *pb.Cre
 			return err
 		}
 
-		ev := &runtime.EventNamespacePayload{
+		ev := &runtime.EventResourcePayload{
 			Type:      runtime.EventNamespaceCreated,
 			Namespace: ns.Name,
 		}
@@ -189,10 +189,45 @@ func (r *Runtime) Create(ctx context.Context, req *pb.CreateRequest, rsp *pb.Cre
 			return err
 		}
 
-		ev := &runtime.EventNetworkPolicyPayload{
-			Type:      runtime.EventNetworkPolicyCreated,
-			Name:      np.Name,
-			Namespace: np.Namespace,
+		ev := &runtime.EventResourcePayload{
+			Type:          runtime.EventNetworkPolicyCreated,
+			Name:          np.Name,
+			Namespace:     np.Namespace,
+			NetworkPolicy: np,
+		}
+
+		return events.Publish(runtime.EventTopic, ev, goevents.WithMetadata(map[string]string{
+			"type":      ev.Type,
+			"namespace": ev.Namespace,
+		}))
+
+	case req.Resource.Resourcequota != nil:
+		rq, err := gorun.NewResourceQuota(
+			req.Resource.Networkpolicy.Name,
+			req.Resource.Networkpolicy.Namespace,
+			&gorun.Resources{
+				CPU:  int(req.Resource.Resourcequota.Requests.CPU),
+				Disk: int(req.Resource.Resourcequota.Requests.EphemeralStorage),
+				Mem:  int(req.Resource.Resourcequota.Requests.Memory),
+			},
+			&gorun.Resources{
+				CPU:  int(req.Resource.Resourcequota.Limits.CPU),
+				Disk: int(req.Resource.Resourcequota.Limits.EphemeralStorage),
+				Mem:  int(req.Resource.Resourcequota.Limits.Memory),
+			},
+		)
+		if err != nil {
+			return err
+		}
+
+		if err := r.Runtime.Create(rq, gorun.CreateNamespace(req.Resource.Networkpolicy.Namespace)); err != nil {
+			return err
+		}
+
+		ev := &runtime.EventResourcePayload{
+			Type:      runtime.EventResourceQuotaCreated,
+			Name:      rq.Name,
+			Namespace: rq.Namespace,
 		}
 
 		return events.Publish(runtime.EventTopic, ev, goevents.WithMetadata(map[string]string{
@@ -267,7 +302,7 @@ func (r *Runtime) Delete(ctx context.Context, req *pb.DeleteRequest, rsp *pb.Del
 			return err
 		}
 
-		ev := &runtime.EventNamespacePayload{
+		ev := &runtime.EventResourcePayload{
 			Type:      runtime.EventNamespaceDeleted,
 			Namespace: ns.Name,
 		}
@@ -287,10 +322,45 @@ func (r *Runtime) Delete(ctx context.Context, req *pb.DeleteRequest, rsp *pb.Del
 			return err
 		}
 
-		ev := &runtime.EventNetworkPolicyPayload{
-			Type:      runtime.EventNetworkPolicyDeleted,
-			Name:      np.Name,
-			Namespace: np.Namespace,
+		ev := &runtime.EventResourcePayload{
+			Type:          runtime.EventNetworkPolicyDeleted,
+			Name:          np.Name,
+			Namespace:     np.Namespace,
+			NetworkPolicy: np,
+		}
+
+		return events.Publish(runtime.EventTopic, ev, goevents.WithMetadata(map[string]string{
+			"type":      ev.Type,
+			"namespace": ev.Namespace,
+		}))
+
+	case req.Resource.Resourcequota != nil:
+		rq, err := gorun.NewResourceQuota(
+			req.Resource.Networkpolicy.Name,
+			req.Resource.Networkpolicy.Namespace,
+			&gorun.Resources{
+				CPU:  int(req.Resource.Resourcequota.Requests.CPU),
+				Disk: int(req.Resource.Resourcequota.Requests.EphemeralStorage),
+				Mem:  int(req.Resource.Resourcequota.Requests.Memory),
+			},
+			&gorun.Resources{
+				CPU:  int(req.Resource.Resourcequota.Limits.CPU),
+				Disk: int(req.Resource.Resourcequota.Limits.EphemeralStorage),
+				Mem:  int(req.Resource.Resourcequota.Limits.Memory),
+			},
+		)
+		if err != nil {
+			return err
+		}
+
+		if err := r.Runtime.Delete(rq, gorun.DeleteNamespace(req.Resource.Networkpolicy.Namespace)); err != nil {
+			return err
+		}
+
+		ev := &runtime.EventResourcePayload{
+			Type:      runtime.EventResourceQuotaDeleted,
+			Name:      rq.Name,
+			Namespace: rq.Namespace,
 		}
 
 		return events.Publish(runtime.EventTopic, ev, goevents.WithMetadata(map[string]string{
@@ -367,10 +437,45 @@ func (r *Runtime) Update(ctx context.Context, req *pb.UpdateRequest, rsp *pb.Upd
 			return err
 		}
 
-		ev := &runtime.EventNetworkPolicyPayload{
-			Type:      runtime.EventNetworkPolicyUpdated,
-			Name:      np.Name,
-			Namespace: np.Namespace,
+		ev := &runtime.EventResourcePayload{
+			Type:          runtime.EventNetworkPolicyUpdated,
+			Name:          np.Name,
+			Namespace:     np.Namespace,
+			NetworkPolicy: np,
+		}
+
+		return events.Publish(runtime.EventTopic, ev, goevents.WithMetadata(map[string]string{
+			"type":      ev.Type,
+			"namespace": ev.Namespace,
+		}))
+
+	case req.Resource.Resourcequota != nil:
+		rq, err := gorun.NewResourceQuota(
+			req.Resource.Networkpolicy.Name,
+			req.Resource.Networkpolicy.Namespace,
+			&gorun.Resources{
+				CPU:  int(req.Resource.Resourcequota.Requests.CPU),
+				Disk: int(req.Resource.Resourcequota.Requests.EphemeralStorage),
+				Mem:  int(req.Resource.Resourcequota.Requests.Memory),
+			},
+			&gorun.Resources{
+				CPU:  int(req.Resource.Resourcequota.Limits.CPU),
+				Disk: int(req.Resource.Resourcequota.Limits.EphemeralStorage),
+				Mem:  int(req.Resource.Resourcequota.Limits.Memory),
+			},
+		)
+		if err != nil {
+			return err
+		}
+
+		if err := r.Runtime.Update(rq, gorun.UpdateNamespace(req.Resource.Networkpolicy.Namespace)); err != nil {
+			return err
+		}
+
+		ev := &runtime.EventResourcePayload{
+			Type:      runtime.EventResourceQuotaUpdated,
+			Name:      rq.Name,
+			Namespace: rq.Namespace,
 		}
 
 		return events.Publish(runtime.EventTopic, ev, goevents.WithMetadata(map[string]string{

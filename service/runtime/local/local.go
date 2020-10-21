@@ -112,6 +112,9 @@ func (r *localRuntime) Create(resource runtime.Resource, opts ...runtime.CreateO
 	case runtime.TypeNetworkPolicy:
 		// noop (NetworkPolicy is not supported by local)
 		return nil
+	case runtime.TypeResourceQuota:
+		// noop (ResourceQuota is not supported by local)
+		return nil
 	case runtime.TypeService:
 
 		// Assert the resource back into a *runtime.Service
@@ -198,6 +201,9 @@ func (r *localRuntime) Logs(resource runtime.Resource, options ...runtime.LogsOp
 		return nil, nil
 	case runtime.TypeNetworkPolicy:
 		// noop (NetworkPolicy is not supported by local)
+		return nil, nil
+	case runtime.TypeResourceQuota:
+		// noop (ResourceQuota is not supported by local)
 		return nil, nil
 	case runtime.TypeService:
 
@@ -360,6 +366,9 @@ func (r *localRuntime) Update(resource runtime.Resource, opts ...runtime.UpdateO
 	case runtime.TypeNetworkPolicy:
 		// noop (NetworkPolicy is not supported by local)
 		return nil
+	case runtime.TypeResourceQuota:
+		// noop (ResourceQuota is not supported by local)
+		return nil
 	case runtime.TypeService:
 
 		// Assert the resource back into a *runtime.Service
@@ -415,6 +424,9 @@ func (r *localRuntime) Delete(resource runtime.Resource, opts ...runtime.DeleteO
 		return nil
 	case runtime.TypeNetworkPolicy:
 		// noop (NetworkPolicy is not supported by local)
+		return nil
+	case runtime.TypeResourceQuota:
+		// noop (ResourceQuota is not supported by local)
 		return nil
 	case runtime.TypeService:
 
